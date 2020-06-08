@@ -1,0 +1,401 @@
+#ifndef BINARYTREE_H
+#define BINARYTREE_H
+
+#include <string>
+#include "Node.h"
+#include <queue>
+
+
+const int COUNT = 10;
+
+/**
+	 * @class BST class
+	 * @brief  create a Binary Search Tree ADT to store data and handle the user accessibility
+	 *
+	 *
+	 * @author Sha Jalili
+	 * @version 02
+	 *
+	 *
+	 * @todo add more functions to complete the data structure accessibility by user
+	 *
+	 * @bug ?
+	 */
+
+template <class T>
+class BinaryTree
+{
+private:
+
+	Node<T> * root;
+
+	/**
+	* @brief insert object in a proper way in the tree data structure
+	*
+	*@param Node<T> to start with and Node<T> to insert in the tree
+	*
+	* @return void
+	*/
+	void insert(Node<T> * r, Node<T> * n);
+
+	/**
+	* @brief copy data in a tree in another tree, use in copy constructor
+	*
+	*@param Node<T> *
+	*
+	* @return void
+	*/
+	void copy(Node<T>* &copiedTreeRoot, Node<T>* otherTreeRoot);
+
+	/**
+	* @brief search through th tree to find particular object using recursive technique
+	*
+	*@param object type T to find in the tree
+	*
+	* @return bool if target node has been found
+	*/
+	bool searchRecursive(Node<T> * r, const T & target);
+
+	/**
+	* @brief calculate the maximum of two integers
+	*
+	*@param two integer x, y
+	*
+	* @return biger number
+	*/
+	int max(int x, int y);
+
+	/**
+	* @brief destroy the whole tree structure
+	*
+	*@param Node<T>
+	*
+	* @return void
+	*/
+	void destroy(Node<T> * node);
+
+	/**
+	* @brief find the height of the tree
+	*
+	*@param rood node of a binary tree
+	*
+	* @return integer number of height of binary tree
+	*/
+	int getHeight(Node<T> * node);
+
+	/**
+	* @brief process data in the tree in-order
+	*
+	*@param Node<T>
+	*
+	* @return void
+	*/
+	void inorder(Node<T> *node, void(*func1) (const T &)) const;
+
+	/**
+	* @brief process data in the tree pre-order
+	*
+	*@param Node<T>
+	*
+	* @return void
+	*/
+	void preorder(Node<T> *node, void(*func1) (const T &)) const;
+
+	/**
+	* @brief process data in the tree post-order
+	*
+	*@param Node<T>
+	*
+	* @return void
+	*/
+	void postorder(Node<T> *node, void(*func1) (const T &)) const;
+
+	//void clearTree(Node<T> * node);
+
+public:
+
+	/**
+	* @brief Default constructor to set root of tree to null pointer
+	*
+	*@param
+	*
+	* @return
+	*/
+	BinaryTree();
+
+	/**
+	* @brief Copy Constructor to copy instances of this class
+	*
+	*@param object of this class
+	*
+	* @return
+	*/
+	BinaryTree(const BinaryTree<T> & tree);
+
+	/**
+	* @brief Default Deconstructor
+	*
+	*@param
+	*
+	* @return
+	*/
+	~BinaryTree();
+
+	/**
+	* @brief Public method to let user inter data in the tree structure
+	*
+	*@param object of type T
+	*
+	* @return void
+	*/
+	void insert(const T & num);
+
+	/**
+	* @brief search through th tree to find particular object
+	*
+	*@param object type T to find in the tree
+	*
+	* @return bool if target node has been found
+	*/
+	bool search(const T & target);
+
+	/**
+	* @brief find the height of the tree
+	*
+	*@param
+	*
+	* @return integer number of height of binary tree
+	*/
+	int height();
+
+	/**
+	* @brief overloading assignment operator for tree equality
+	*
+	*@param template tree structure
+	*
+	* @return tree
+	*/
+	const BinaryTree<T> & operator= (const BinaryTree<T> & otherTree);
+
+	/** @brief  inorder printi data
+	*
+	* @return void
+	*/
+	void inorderTraversal(void(*func1) (const T &)) const;
+
+	/** @brief preorder print data
+	 *
+	 * @return void
+	 */
+	void preorderTraversal(void(*func1) (const T &)) const;
+
+	/** @brief postorder print data
+	 *
+	 * @return void
+	 */
+	void postorderTraversal(void(*func1) (const T &)) const;
+
+
+
+};
+
+
+template <class T>
+BinaryTree<T>::BinaryTree() {
+	root = nullptr;
+}
+
+
+template <class T>
+BinaryTree<T>::BinaryTree(const BinaryTree<T> & tree) {
+	root = nullptr;
+	copy(this->root, tree.root);
+}
+
+template <class T>
+BinaryTree<T>::~BinaryTree() { destroy(root); }
+
+
+template <class T>
+void BinaryTree<T>::insert(const T & val) {
+	if (root == nullptr) {
+		Node<T> * newNode = new Node<T>;
+		newNode->n_data = val; // can be removed because constructor does the job
+		root = newNode;
+	}
+	else {
+		Node<T> * newNode = new Node<T>;
+		newNode->n_data = val;
+		insert(newNode, root);
+	}
+}
+
+template <class T>
+void BinaryTree<T>::insert(Node<T> * newNode, Node<T> * r) {
+
+	// Recursive version of insert causes stack over flow when big amount of data inserted
+	if (newNode->n_data > r->n_data && newNode->n_data != r->n_data) {
+		if (r->right == nullptr) {
+			r->right = newNode;
+		}
+		else if (newNode->n_data != r->n_data) {
+			insert(newNode, r->right);
+		}
+	}
+	else {
+		if (r->left == nullptr) {
+			r->left = newNode;
+		}
+		else if (newNode->n_data != r->n_data) {
+			insert(newNode, r->left);
+		}
+	}
+}
+
+
+template <class T>
+bool BinaryTree<T>::search(const T & target) {
+
+	bool found = false;
+	found = searchRecursive(root, target);
+
+	return found;
+}
+
+template <class T>
+bool BinaryTree<T>::searchRecursive(Node<T> * root, const T & target) {
+	if (root == NULL)
+		return false;
+	else
+		if (root->n_data == target)
+			return true;
+		else
+			if (root->n_data < target)
+				return searchRecursive(root->right, target);
+			else
+				return searchRecursive(root->left, target);
+}
+
+template <class T>
+void BinaryTree<T>::copy(Node<T>* &copiedTreeRoot, Node<T>* otherTreeRoot)
+{
+	if (otherTreeRoot == nullptr)
+		copiedTreeRoot = nullptr;
+	else
+	{
+		copiedTreeRoot = new Node<T>;
+		copiedTreeRoot->n_data = otherTreeRoot->n_data;
+		copy(copiedTreeRoot->left, otherTreeRoot->left);
+		copy(copiedTreeRoot->right, otherTreeRoot->right);
+	}
+} //end copyTree
+
+template <class T>
+int BinaryTree<T>::getHeight(Node<T> * node) {
+	int h = 0;
+
+	if (node == nullptr) {
+		return 0;
+	}
+	else {
+		h = 1 + max(getHeight(node->right), getHeight(node->left));
+	}
+	return h;
+}
+
+template <class T>
+int BinaryTree<T>::height() {
+	int h = 0;
+	h = getHeight(root);
+	return h;
+}
+
+template <class T>
+int BinaryTree<T>::max(int x, int y) {
+	if (x >= y) {
+		return x;
+	}
+	else {
+		return y;
+	}
+}
+
+template <class T>
+void BinaryTree<T>::destroy(Node<T> * node) {
+	if (node != nullptr) {
+		destroy(node->left);
+		destroy(node->right);
+		delete node;
+		node = nullptr;
+	}
+
+
+}
+
+template <class T>
+const BinaryTree<T> & BinaryTree<T>::operator= (const BinaryTree<T> & otherTree) {
+
+	if (this != &otherTree) //avoid self-copy
+	{
+		if (root != nullptr) //if the binary tree is not empty and destroy the binary tree
+			destroy(root);
+
+		if (otherTree.root == nullptr) //otherTree is empty
+			root = nullptr;
+		else
+			copy(root, otherTree.root);
+	}//end else
+	return *this;
+}
+
+template<class T>
+void BinaryTree<T>::inorder(Node<T> *node, void(*func1) (const T &)) const {
+	if (node != nullptr)
+	{
+		inorder(node->left, *func1);
+		(*func1)(node->n_data);
+		inorder(node->right, *func1);
+	}
+}
+
+
+template<class T>
+void BinaryTree<T>::preorder(Node<T> *node, void(*func1) (const T &)) const {
+	if (node != nullptr)
+	{
+		(*func1)(node->n_data);
+		preorder(node->left, *func1);
+		preorder(node->right, *func1);
+	}
+}
+
+template<class T>
+void BinaryTree<T>::postorder(Node<T> *node, void(*func1) (const T &)) const {
+	if (node != nullptr)
+	{
+		postorder(node->left, *func1);
+		postorder(node->right, *func1);
+		(*func1)(node->n_data);
+	}
+}
+
+template<class T>
+void BinaryTree<T>::inorderTraversal(void(*func1) (const T &)) const
+{
+	inorder(root, *func1);
+}
+
+
+template<class T>
+void BinaryTree<T>::preorderTraversal(void(*func1) (const T &)) const
+{
+	preorder(root, *func1);
+}
+
+template<class T>
+void BinaryTree<T>::postorderTraversal(void(*func1) (const T &)) const
+{
+	postorder(root, *func1);
+}
+
+#endif
