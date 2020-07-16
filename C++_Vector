@@ -1,0 +1,210 @@
+#ifndef VECTOR_H
+#define VECTOR_H
+
+#include <string>
+#include <algorithm>
+
+using namespace std;
+/**
+	 * @class Vector class
+	 * @brief Vector class creates a vector contains a dynamic array
+	 *
+	 *
+	 * @author Sha Jalili
+	 * @version 03
+	 * @date 18/04/2020 Sha Jalili, Started
+	 *
+	 *
+	 * @todo add more functiones to complete the vector class
+	 *
+	 * @bug
+	 */
+
+template <class T>
+class Vector
+{
+private:
+	size_t size;
+	size_t capacity;
+	T * _data = nullptr;
+
+	void resize(size_t newsize);
+
+public:
+
+	/**
+	* @brief Default constructor of Vector class
+	*
+	* @return
+	*/
+	Vector(size_t s = 0, const T & initVal = T());
+
+	/**
+	* @brief Copy constructor of calculator class
+	*
+	* @return
+	*/
+	Vector(const Vector & v);
+
+	/**
+	* @brief  swap two vectors
+	*
+	* @param Vector, Vector
+	*
+	* @return void
+	*/
+	void swapl(Vector& v1, Vector& v2) noexcept;
+
+	/**
+	* @brief Deconstrutor, delete the array inside of the vector
+	*
+	* @return
+	*/
+	~Vector();
+
+	/**
+	* @brief get size of the vector
+	*
+	* @return size_t size of vector
+	*/
+	size_t getSize() const;
+
+	/**
+	* @brief get number of elements in the vector
+	*
+	* @return size_t capacity of vector
+	*/
+	size_t getCapacity() const;
+
+
+	/**
+	* @brief assignment operator overload for vector class
+	*
+	* @return address of vector
+	*/
+	Vector & operator=(const Vector& v) noexcept;
+
+	/**
+	* @brief Sqaure bracket [] operator overload for vector class
+	*
+	* @return Address of an object containging in the vector
+	*/
+	const T & operator[](int i) const;
+
+	/**
+	* @brief Sqaure bracket [] operator overload for vector class
+	*
+	* @return Address of an object containging in the vector, use for modification of element in the vector
+	*/
+	T & operator[](int i);
+
+	/**
+	* @brief Add new value to the vector and add one to size
+	*
+	* @return void
+	*/
+	void add(const T& val);
+
+	void clearData();
+
+	bool operator>(const Vector<T> & val);
+
+
+protected:
+
+};
+
+template <class T>
+Vector<T>::Vector(size_t s , const T & initVal ) :
+	size(s),
+	capacity(std::max((size_t)4, s * 2)),
+	_data(new T[capacity + 1])
+{
+	std::fill(_data, _data + size, initVal);
+};
+
+template <class T>
+Vector<T>::Vector(const Vector & v) :
+	size(v.size),
+	capacity(v.capacity),
+	_data(new T[v.capacity])
+{
+	std::copy(v._data, v._data + v.capacity, _data);
+};
+
+template <class T>
+Vector<T> & Vector<T>::operator=(const Vector& v) noexcept {
+	Vector temp(v);
+	swapl(temp, *this);
+	return *this;
+}
+
+template <class T>
+void Vector<T>::resize(size_t newsize)
+{
+	if (newsize >= capacity)
+	{
+		T * newdata = new T[newsize * 2]();
+		std::copy(_data, _data + size, newdata);
+		delete[] _data;
+		_data = newdata;
+		size = newsize;
+		capacity = newsize * 2;
+	}
+	else
+		size = newsize;
+}
+
+template <class T>
+void Vector<T>::swapl(Vector& v1, Vector& v2) noexcept
+{
+	std::swap(v1._data, v2._data);
+	std::swap(v1.size, v2.size);
+	std::swap(v1.capacity, v2.capacity);
+}
+
+template <class T>
+size_t Vector<T>::getSize() const {
+	return size;
+}
+
+template <class T>
+size_t Vector<T>::getCapacity() const {
+	return capacity;
+}
+
+template <class T>
+Vector<T>::~Vector() {
+	delete[] _data;
+}
+
+
+template <class T>
+const T & Vector<T>::operator[](int i) const {
+	return _data[i];
+}
+
+template <class T>
+T & Vector<T>::operator[](int i) {
+	return _data[i];
+}
+
+template <class T>
+void Vector<T>::add(const T& val)
+{
+	resize(size + 1);
+	operator[](size - 1) = val;
+	_data[size - 1] = val;
+}
+
+template <class T>
+void Vector<T>::clearData() {
+	this->size = 0;
+	this->capacity = 0;
+}
+
+template <class T>
+bool Vector<T>::operator>(const Vector<T> & val) {
+	return (this->getSize() > val.getSize());
+}
+#endif
